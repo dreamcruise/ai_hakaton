@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 
 from .models import UserIntake, Product, Meal, MealFavorite, MealReaction
+from .tasks import compute_daily_targets_for_user
 
 from api.services.ration_generator import generate_ration
 import subprocess
@@ -88,6 +89,9 @@ def intake_wizard(request):
 				kitchen_equipment=kitchen_equipment,
 				preferred_units=preferred_units,
 			)
+			# Kick off background computation of daily targets
+			compute_daily_targets_for_user.delay(username)
+			messages.info(request, 'Profile saved. Daily targets are being computed in the background.')
 			return redirect('profile', username=username)
 
 	context = {
@@ -101,11 +105,12 @@ def intake_wizard(request):
 	}
 	return render(request, 'intake_wizard.html', context)
 
+@login_required
 def profile(request, username: str):
 	latest = UserIntake.objects.filter(username=username).order_by('-created_at').first()
 	return render(request, 'profile.html', { 'username': username, 'profile': latest })
 
-
+@login_required
 @require_http_methods(["GET", "POST"])
 def product_new(request):
 	if request.method == 'POST':
@@ -122,7 +127,7 @@ def product_new(request):
 		return redirect('home')
 	return render(request, 'product_new.html', { 'types': ['proteins','carbohydrates','fats','fiber'] })
 
-
+@login_required
 @require_http_methods(["GET", "POST"])
 def meal_new(request):
 	if request.method == 'POST':
@@ -140,7 +145,7 @@ def meal_new(request):
 		return redirect('home')
 	return render(request, 'meal_new.html', { 'types': ['proteins','carbohydrates','fats','fiber'] })
 
-
+@login_required
 @require_http_methods(["POST"])
 def meal_favorite(request, pk: int):
 	meal = get_object_or_404(Meal, pk=pk)
@@ -149,6 +154,7 @@ def meal_favorite(request, pk: int):
 	messages.success(request, 'Favorited meal')
 	return redirect('home')
 
+@login_required
 @require_http_methods(["POST"])
 def meal_reaction(request, pk: int):
 	meal = get_object_or_404(Meal, pk=pk)
@@ -165,6 +171,7 @@ def _run_script(module_path: str, args: list[str]) -> tuple[int, str]:
 	proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env)
 	return proc.returncode, proc.stdout.decode('utf-8', errors='replace')
 
+@login_required
 @require_http_methods(["POST"])
 def generate_daily_ration(request, username: str):
     if request.method == "POST":
@@ -173,7 +180,7 @@ def generate_daily_ration(request, username: str):
         return render(request, "ration_result.html", {"ration": data})
     return redirect("profile", username='vosh') #username
 
-
+@login_required
 @require_http_methods(["POST"])
 def update_daily_ration(request, username: str):
 	try:

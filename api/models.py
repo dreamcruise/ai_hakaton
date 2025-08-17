@@ -19,25 +19,36 @@ class UserIntake(models.Model):
 	preferred_units = models.CharField(max_length=16)
 	created_at = models.DateTimeField(auto_now_add=True)
 
+	# Daily targets
+	target_calories = models.FloatField(null=True, blank=True)
+	target_proteins = models.FloatField(null=True, blank=True)
+	target_carbohydrates = models.FloatField(null=True, blank=True)
+	target_fats = models.FloatField(null=True, blank=True)
+	created_at = models.DateTimeField(auto_now_add=True)
+
 	class Meta:
 		indexes = [models.Index(fields=["username"])]
 
 class Product(models.Model):
+	user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='products', null=True, blank=True)
 	name = models.CharField(max_length=128)
 	calories = models.FloatField()
 	type = models.CharField(max_length=32)
 	proteins = models.FloatField()
 	carbohydrates = models.FloatField()
 	fats = models.FloatField()
+	weight = models.FloatField()
 	created_at = models.DateTimeField(auto_now_add=True)
 	
 class Meal(models.Model):
+	user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='meals', null=True, blank=True)
 	name = models.CharField(max_length=128)
 	calories = models.FloatField()
 	type = models.CharField(max_length=32)
 	proteins = models.FloatField()
 	carbohydrates = models.FloatField()
 	fats = models.FloatField()
+	weight = models.FloatField()
 	recipe = models.TextField()
 	created_at = models.DateTimeField(auto_now_add=True)
 

@@ -66,6 +66,11 @@ def generate_ration(username: Optional[str] = None, model: str = None) -> Dict[s
         ],
     }
 
+    catalog = {
+			'products': list(Product.objects.filter(user__username=username).order_by('id').values('id','name','calories','proteins','carbohydrates','fats','weight','type')),
+			'meals': list(Meal.objects.filter(user__username=username).order_by('id').values('id','name','calories','proteins','carbohydrates','fats','weight','type','recipe')),
+		}
+
     # prompt
     messages = [
         {"role": "system", "content": "You are a nutrition assistant..."},
