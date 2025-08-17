@@ -1,0 +1,114 @@
+/* intake.css – оформление формы в стиле Stripe */
+
+body {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: linear-gradient(180deg,#ffffff 0%, #fbfdff 40%, #f7f9ff 100%);
+  color: #0f172a;
+  margin: 0;
+  padding: 2rem;
+}
+
+h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: #111827;
+  text-align: center;
+}
+
+.messages {
+  list-style: none;
+  padding: 1rem;
+  margin: 1rem auto;
+  max-width: 600px;
+  border-radius: 12px;
+  background: #eef2ff;
+  color: #4338ca;
+  font-weight: 500;
+}
+
+form {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(2,6,23,0.08), 0 2px 8px rgba(2,6,23,0.06);
+}
+
+fieldset {
+  border: none;
+  margin-bottom: 2rem;
+  padding: 0;
+}
+
+legend {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #4f46e5;
+}
+
+label {
+  display: block;
+  margin-bottom: 1rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="password"],
+select {
+  display: block;
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  font-size: 1rem;
+  margin-top: 0.3rem;
+  background: #fff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.3);
+}
+
+strong {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #111827;
+  font-weight: 600;
+}
+
+input[type="checkbox"] {
+  margin-right: 0.5rem;
+}
+
+button[type="submit"] {
+  display: inline-block;
+  padding: 0.9rem 1.6rem;
+  background: linear-gradient(180deg, #6366f1, #4f46e5);
+  border: none;
+  border-radius: 999px;
+  color: #fff;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+button[type="submit"]:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(79,70,229,0.3);
+}
+
+button[type="submit"]:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(79,70,229,0.2);
+}

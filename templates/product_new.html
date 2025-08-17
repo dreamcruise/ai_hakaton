@@ -1,0 +1,30 @@
+{% load static %}
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>New Product</title>
+	<link rel="stylesheet" href="{% static 'css/product_new.css' %}"  />
+</head>
+<body>
+	<h2>Create Product</h2>
+	<form method="post">
+		{% csrf_token %}
+		<label>Name <input name="name" required></label>
+		<label>Calories <input type="number" name="calories" step="0.1" required></label>
+		<label>Type
+			<select name="type">
+				<option>proteins</option>
+				<option>carbohydrates</option>
+				<option>fats</option>
+				<option>fiber</option>
+			</select>
+		</label>
+		<label>Proteins (g) <input type="number" step="0.1" name="proteins" required></label>
+		<label>Carbohydrates (g) <input type="number" step="0.1" name="carbohydrates" required></label>
+		<label>Fats (g) <input type="number" step="0.1" name="fats" required></label>
+		<button type="submit">Save</button>
+	</form>
+	
+</body>
+</html>

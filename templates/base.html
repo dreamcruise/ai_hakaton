@@ -1,0 +1,51 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Планировщик Питания{% endblock %}</title>
+    <meta name="description" content="{% block description %}Умный планировщик питания с отслеживанием макронутриентов и управлением продуктами{% endblock %}">
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="{% static 'css/styles.css' %}" as="style">
+    <link rel="preload" href="{% static 'js/main.js' %}" as="script">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/components.css' %}">
+    <link rel="stylesheet" href="{% static 'css/animations.css' %}">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="{% static 'images/favicon.svg' %}">
+    
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="min-h-screen bg-background text-foreground font-sans">
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+    
+    <!-- Main Content -->
+    <div id="app" class="min-h-screen">
+        {% block content %}{% endblock %}
+    </div>
+    
+    <!-- Modals Container -->
+    <div id="modal-container"></div>
+    
+    <!-- Loading Spinner -->
+    <div id="loading-spinner" class="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="{% static 'js/utils.js' %}"></script>
+    <script src="{% static 'js/components.js' %}"></script>
+    <script src="{% static 'js/forms.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+    
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,39 @@
+{% load static %}
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>{{ username }}'s Profile</title>
+	<link rel="stylesheet" href="{% static 'css/profile.css' %}"  />
+</head>
+<body>
+	<div class="profile-card">
+		<h2>Welcome, {{ username }}</h2>
+		{% if profile %}
+			<p>Display Name: {{ profile.display_name }}</p>
+			<p>Gender: {{ profile.gender }}, Age: {{ profile.age }}</p>
+			<p>Height: {{ profile.height }} cm, Weight: {{ profile.weight }} kg</p>
+			<p>Goal: {{ profile.goal }}, Activity: {{ profile.activity_level }}</p>
+			<p>Dietary: {{ profile.dietary_restrictions }}, Allergies: {{ profile.allergies }}</p>
+			<p>Cooking: {{ profile.cooking_skill }}, Equipment: {{ profile.kitchen_equipment }}</p>
+			<p>Units: {{ profile.preferred_units }}</p>
+		{% else %}
+			<p>No profile found yet.</p>
+		{% endif %}
+		<p><a href="/">Home</a></p>
+		<p><a href="/products/new/">New Product</a></p>
+		<p><a href="/meals/new/">New Meal</a></p>
+	</div>
+	
+	<div class="actions" style="margin-top:24px">
+			<form method="post" action="/profile/{{ username }}/generate/">
+				{% csrf_token %}
+				<button type="submit" class="btn-primary">Generate Daily Ration</button>
+			</form>
+			<form method="post" action="/profile/{{ username }}/update/">
+				{% csrf_token %}
+				<button type="submit" class="btn-primary" style="background: linear-gradient(135deg, var(--accent-2), var(--accent));">Update Disliked Meals</button>
+			</form>
+	</div>
+</body>
+</html>

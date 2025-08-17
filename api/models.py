@@ -1,0 +1,92 @@
+from django.db import models
+
+# Create your models here.
+class UserIntake(models.Model):
+	username = models.CharField(max_length=64)
+	display_name = models.CharField(max_length=128)
+	gender = models.CharField(max_length=32)
+	age = models.PositiveIntegerField()
+	height = models.FloatField()
+	weight = models.FloatField()
+	goal = models.CharField(max_length=32)
+	activity_level = models.CharField(max_length=32)
+	dietary_restrictions = models.JSONField(null=True, blank=True)
+	allergies = models.JSONField(null=True, blank=True)
+	cooking_skill = models.CharField(max_length=32)
+	kitchen_equipment = models.JSONField(null=True, blank=True)
+	preferred_units = models.CharField(max_length=16)
+	created_at = models.DateTimeField(auto_now_add=True)
+
+	class Meta:
+		indexes = [models.Index(fields=["username"])]
+
+class Product(models.Model):
+	name = models.CharField(max_length=128)
+	calories = models.FloatField()
+	type = models.CharField(max_length=32)
+	proteins = models.FloatField()
+	carbohydrates = models.FloatField()
+	fats = models.FloatField()
+	created_at = models.DateTimeField(auto_now_add=True)
+	
+class Meal(models.Model):
+	name = models.CharField(max_length=128)
+	calories = models.FloatField()
+	type = models.CharField(max_length=32)
+	proteins = models.FloatField()
+	carbohydrates = models.FloatField()
+	fats = models.FloatField()
+	recipe = models.TextField()
+	created_at = models.DateTimeField(auto_now_add=True)
+
+class ProductFavorite(models.Model):
+	product = models.ForeignKey(Product, on_delete=models.CASCADE)
+	username = models.CharField(max_length=64)
+	created_at = models.DateTimeField(auto_now_add=True)
+
+	class Meta:
+		unique_together = ("product", "username")
+
+class MealFavorite(models.Model):
+	meal = models.ForeignKey(Meal, on_delete=models.CASCADE)
+	username = models.CharField(max_length=64)
+	created_at = models.DateTimeField(auto_now_add=True)
+
+	class Meta:
+		unique_together = ("meal", "username")
+
+class ProductReaction(models.Model):
+	product = models.ForeignKey(Product, on_delete=models.CASCADE)
+	username = models.CharField(max_length=64)
+	reaction = models.CharField(max_length=16)  # like/dislike
+	created_at = models.DateTimeField(auto_now_add=True)
+
+	class Meta:
+		unique_together = ("product", "username")
+
+class MealReaction(models.Model):
+	meal = models.ForeignKey(Meal, on_delete=models.CASCADE)
+	username = models.CharField(max_length=64)
+	reaction = models.CharField(max_length=16)
+	created_at = models.DateTimeField(auto_now_add=True)
+
+	class Meta:
+		unique_together = ("meal", "username")
+
+class DailyRationPlan(models.Model):
+	username = models.CharField(max_length=64)
+	model = models.CharField(max_length=64, null=True, blank=True)
+	raw_response = models.JSONField(null=True, blank=True)
+	created_at = models.DateTimeField(auto_now_add=True)
+
+class DailyRationItem(models.Model):
+	plan = models.ForeignKey(DailyRationPlan, on_delete=models.CASCADE)
+	position = models.PositiveIntegerField()
+	name = models.CharField(max_length=256)
+	recipe = models.TextField()
+	proteins = models.FloatField()
+	carbohydrates = models.FloatField()
+	fats = models.FloatField()
+	fiber = models.FloatField()
+	eaten = models.BooleanField(default=False)
+	created_at = models.DateTimeField(auto_now_add=True)
