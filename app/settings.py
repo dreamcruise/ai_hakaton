@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from pathlib import Path
 from environs import Env
+import ssl
 
 env = Env()
 env.read_env()
@@ -137,6 +138,33 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
+
+REDIS_URL = env.str('REDIS_URL')
+
+cache_options = {
+    "CLIENT_CLASS": "django_redis.client.DefaultClient",
+}
+
+if REDIS_URL.startswith("rediss://"):
+    cache_options["SSL_CERT_REQS"] = ssl.CERT_NONE  # или CERT_REQUIRED для строгой проверки
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": REDIS_URL,
+        "OPTIONS": cache_options,
+    }
+}
+
 # Celery
-CELERY_BROKER_URL = env.str('REDIS_URL')
-CELERY_RESULT_BACKEND = env.str('REDIS_URL')
+CELERY_BROKER_URL = REDIS_URL
+CELERY_RESULT_BACKEND = REDIS_URL
+
+CELERY_BROKER_USE_SSL = None
+CELERY_RESULT_BACKEND_USE_SSL = None
+if REDIS_URL.startswith("rediss://"):
+    ssl_options = {"ssl_cert_reqs": ssl.CERT_NONE}  # или CERT_REQUIRED
+    CELERY_BROKER_USE_SSL = ssl_options
+    CELERY_RESULT_BACKEND_USE_SSL = ssl_options
+
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"

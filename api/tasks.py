@@ -11,7 +11,7 @@ env.read_env()
 @shared_task
 def compute_daily_targets_for_user(username: str) -> dict:
 	from openai import OpenAI  # local import to avoid import at worker boot if missing
-	api_key = os.getenv('OPENAI_API_KEY')
+	api_key = env.str('OPENAI_API_KEY')
 	if not api_key:
 		return {"error": "OPENAI_API_KEY is not set"}
 
@@ -45,7 +45,7 @@ def compute_daily_targets_for_user(username: str) -> dict:
 
 	client = OpenAI(api_key=api_key)
 	completion = client.chat.completions.create(
-		model=os.getenv('OPENAI_MODEL', 'gpt-4o-mini'),
+		model='gpt-4o-mini',
 		messages=[
 			{"role": "system", "content": "You are a nutrition calculator."},
 			{"role": "user", "content": json.dumps(prompt, ensure_ascii=False)},

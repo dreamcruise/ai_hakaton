@@ -57,7 +57,7 @@ def logout_view(request):
 def intake_wizard(request):
 	if request.method == 'POST':
 		data = request.POST
-		username = data.get('username','').strip()
+		username = request.user
 		display_name = data.get('display_name','').strip()
 		gender = data.get('gender')
 		age = int(data.get('age') or 0)
@@ -71,7 +71,8 @@ def intake_wizard(request):
 		kitchen_equipment = request.POST.getlist('kitchen_equipment') or []
 		preferred_units = data.get('preferred_units')
 
-		if not username or not display_name or age < 13 or age > 120 or height < 100 or height > 250 or weight < 30 or weight > 300:
+		if not username or age < 13 or age > 120 or height < 100 or height > 250 or weight < 30 or weight > 300:
+			print(username)
 			messages.error(request, 'Please correct the fields and try again.')
 		else:
 			UserIntake.objects.create(
