@@ -5,6 +5,7 @@ import os, json
 from api.models import UserIntake, Product, Meal, DailyRationPlan, DailyRationItem
 from django.db import transaction
 from django.db.models import F
+import logging
 
 env = Env()
 env.read_env()
@@ -66,6 +67,7 @@ def compute_daily_targets_for_user(username: str) -> dict:
     )
 
     content = completion.choices[0].message.content or "{}"
+    logging.getLogger(__name__).info("GPT raw targets for %s: %s", username, content)
     try:
         data = json.loads(content)
     except json.JSONDecodeError:
