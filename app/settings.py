@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from pathlib import Path
 from environs import Env
+from django.core.cache import cache
 import ssl
 
 env = Env()
@@ -146,25 +147,22 @@ cache_options = {
 }
 
 if REDIS_URL.startswith("rediss://"):
-    cache_options["SSL_CERT_REQS"] = ssl.CERT_NONE  # или CERT_REQUIRED для строгой проверки
+    # Для django-redis верхний регистр SSL_CERT_REQS
+    cache_options["ssl_cert_reqs"] = ssl.CERT_NONE
 
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": REDIS_URL,
-        "OPTIONS": cache_options,
-    }
-}
 
+# ========================
 # Celery
+# ========================
 CELERY_BROKER_URL = REDIS_URL
 CELERY_RESULT_BACKEND = REDIS_URL
 
-CELERY_BROKER_USE_SSL = None
-CELERY_RESULT_BACKEND_USE_SSL = None
+# Kombu/Celery ждёт параметр ssl_cert_reqs в нижнем регистре
 if REDIS_URL.startswith("rediss://"):
-    ssl_options = {"ssl_cert_reqs": ssl.CERT_NONE}  # или CERT_REQUIRED
-    CELERY_BROKER_USE_SSL = ssl_options
-    CELERY_RESULT_BACKEND_USE_SSL = ssl_options
+    CELERY_BROKER_USE_SSL = {"ssl_cert_reqs": ssl.CERT_NONE}
+    CELERY_RESULT_BACKEND_USE_SSL = {"ssl_cert_reqs": ssl.CERT_NONE}
+else:
+    CELERY_BROKER_USE_SSL = None
+    CELERY_RESULT_BACKEND_USE_SSL = None
 
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"

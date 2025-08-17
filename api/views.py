@@ -54,57 +54,57 @@ def logout_view(request):
 
 @login_required
 @require_http_methods(["GET", "POST"])
+@login_required
 def intake_wizard(request):
-	if request.method == 'POST':
-		data = request.POST
-		username = request.user
-		display_name = data.get('display_name','').strip()
-		gender = data.get('gender')
-		age = int(data.get('age') or 0)
-		height = float(data.get('height') or 0)
-		weight = float(data.get('weight') or 0)
-		goal = data.get('goal')
-		activity_level = data.get('activity_level')
-		dietary_restrictions = request.POST.getlist('dietary_restrictions') or []
-		allergies = [a.strip() for a in (data.get('allergies','').split(',') if data.get('allergies') else []) if a.strip()]
-		cooking_skill = data.get('cooking_skill')
-		kitchen_equipment = request.POST.getlist('kitchen_equipment') or []
-		preferred_units = data.get('preferred_units')
+    if request.method == 'POST':
+        data = request.POST
+        username_str = request.user.username  # string, not User
+        display_name = (data.get('display_name') or '').strip()
+        gender = data.get('gender')
+        age = int(data.get('age') or 0)
+        height = float(data.get('height') or 0)
+        weight = float(data.get('weight') or 0)
+        goal = data.get('goal')
+        activity_level = data.get('activity_level')
+        dietary_restrictions = request.POST.getlist('dietary_restrictions') or []
+        allergies = [a.strip() for a in (data.get('allergies','').split(',') if data.get('allergies') else []) if a.strip()]
+        cooking_skill = data.get('cooking_skill')
+        kitchen_equipment = request.POST.getlist('kitchen_equipment') or []
+        preferred_units = data.get('preferred_units')
 
-		if not username or age < 13 or age > 120 or height < 100 or height > 250 or weight < 30 or weight > 300:
-			print(username)
-			messages.error(request, 'Please correct the fields and try again.')
-		else:
-			UserIntake.objects.create(
-				username=username,
-				display_name=display_name,
-				gender=gender,
-				age=age,
-				height=height,
-				weight=weight,
-				goal=goal,
-				activity_level=activity_level,
-				dietary_restrictions=dietary_restrictions,
-				allergies=allergies,
-				cooking_skill=cooking_skill,
-				kitchen_equipment=kitchen_equipment,
-				preferred_units=preferred_units,
-			)
-			# Kick off background computation of daily targets
-			compute_daily_targets_for_user.delay(username)
-			messages.info(request, 'Profile saved. Daily targets are being computed in the background.')
-			return redirect('profile', username=username)
+        if age < 13 or age > 120 or height < 100 or height > 250 or weight < 30 or weight > 300:
+            messages.error(request, 'Please correct the fields and try again.')
+        else:
+            UserIntake.objects.create(
+                user=request.user,            # link to auth user
+                username=username_str,        # store string
+                display_name=display_name,
+                gender=gender,
+                age=age,
+                height=height,
+                weight=weight,
+                goal=goal,
+                activity_level=activity_level,
+                dietary_restrictions=dietary_restrictions,
+                allergies=allergies,
+                cooking_skill=cooking_skill,
+                kitchen_equipment=kitchen_equipment,
+                preferred_units=preferred_units,
+            )
+            compute_daily_targets_for_user.delay(username_str)  # pass string
+            messages.info(request, 'Profile saved. Daily targets are being computed in the background.')
+            return redirect('profile', username=username_str)
 
-	context = {
-		'genders': ['male','female','prefer_not_to_say'],
-		'goals': ['lose_weight','maintain_weight','gain_weight'],
-		'activities': ['low','medium','high'],
-		'restrictions': ['vegetarian','vegan','halal','kosher','lactose_free','gluten_free','none'],
-		'cooking_skills': ['beginner','intermediate','advanced'],
-		'equipments': ['oven','microwave','stovetop','blender','food_processor','stand_mixer','air_fryer','slow_cooker','pressure_cooker','grill','toaster','rice_cooker','juicer','kitchen_scale','immersion_blender','mandoline'],
-		'units': ['metric','imperial'],
-	}
-	return render(request, 'intake_wizard.html', context)
+    context = {
+        'genders': ['male','female','prefer_not_to_say'],
+        'goals': ['lose_weight','maintain_weight','gain_weight'],
+        'activities': ['low','medium','high'],
+        'restrictions': ['vegetarian','vegan','halal','kosher','lactose_free','gluten_free','none'],
+        'cooking_skills': ['beginner','intermediate','advanced'],
+        'equipments': ['oven','microwave','stovetop','blender','food_processor','stand_mixer','air_fryer','slow_cooker','pressure_cooker','grill','toaster','rice_cooker','juicer','kitchen_scale','immersion_blender','mandoline'],
+        'units': ['metric','imperial'],
+    }
+    return render(request, 'intake_wizard.html', context)
 
 @login_required
 def profile(request, username: str):
