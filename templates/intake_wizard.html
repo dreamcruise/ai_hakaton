@@ -16,7 +16,7 @@
 		{% csrf_token %}
 		<fieldset>
 			<legend>Step 1: Profile</legend>
-			<label>Username <input name="username" required></label>
+			<label>Username <span>{{ prefilled_username }}</span><input type="hidden" name="username" value="{{ prefilled_username }}" /></label>
 			<label>Display Name <input name="display_name" required></label>
 			<label>Gender
 				<select name="gender">

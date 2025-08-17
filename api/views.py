@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.core import management
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 
 from .models import UserIntake, Product, Meal, MealFavorite, MealReaction
 
@@ -44,12 +45,13 @@ def login_view(request):
 		messages.error(request, 'Invalid login or password')
 	return render(request, 'login.html')
 
-
+@login_required
 def logout_view(request):
 	logout(request)
 	messages.success(request, 'You have been logged out')
 	return redirect('home')
 
+@login_required
 @require_http_methods(["GET", "POST"])
 def intake_wizard(request):
 	if request.method == 'POST':
