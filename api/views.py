@@ -2,16 +2,53 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_http_methods
 from django.contrib import messages
 from django.core import management
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
 
 from .models import UserIntake, Product, Meal, MealFavorite, MealReaction
-from api.services.ration_generator import generate_ration
 
+from api.services.ration_generator import generate_ration
 import subprocess
 import sys
 import os
 
 def index(request):
 	return render(request, 'index.html')
+
+@require_http_methods(["GET", "POST"])
+def register(request):
+	if request.method == 'POST':
+		username = (request.POST.get('username') or '').strip()
+		password = (request.POST.get('password') or '').strip()
+		if not username or not password:
+			messages.error(request, 'Username and password are required')
+			return render(request, 'register.html')
+		if User.objects.filter(username=username).exists():
+			messages.error(request, 'User with this login already exists')
+			return render(request, 'register.html')
+		User.objects.create_user(username=username, password=password)
+		messages.success(request, 'Registration successful. Please log in.')
+		return redirect('login')
+	return render(request, 'register.html')
+
+
+@require_http_methods(["GET", "POST"])
+def login_view(request):
+	if request.method == 'POST':
+		username = (request.POST.get('username') or '').strip()
+		password = (request.POST.get('password') or '').strip()
+		user = authenticate(request, username=username, password=password)
+		if user is not None:
+			login(request, user)
+			return redirect('intake')
+		messages.error(request, 'Invalid login or password')
+	return render(request, 'login.html')
+
+
+def logout_view(request):
+	logout(request)
+	messages.success(request, 'You have been logged out')
+	return redirect('home')
 
 @require_http_methods(["GET", "POST"])
 def intake_wizard(request):
